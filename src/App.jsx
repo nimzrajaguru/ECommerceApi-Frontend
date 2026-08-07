@@ -1,8 +1,20 @@
+import { Routes, Route, Link } from 'react-router-dom'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+
 function App() {
   return (
     <div>
-      <h1>ECommerceApi Frontend</h1>
-      <p>Coursework 02 starting point.</p>
+      <nav>
+        <Link to="/">Home</Link>
+        {' | '}
+        <Link to="/login">Login</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </div>
   )
 }
