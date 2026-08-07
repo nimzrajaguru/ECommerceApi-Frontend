@@ -18,42 +18,72 @@ function App() {
 
   return (
     <div>
-      <nav>
-        <Link to="/">Home</Link>
-        {' | '}
-<Link to="/products">Products</Link>
-        {' | '}
-<Link to="/orders">My Orders</Link>
-        {' | '}
-        {token ? (
-          <>
-            <span>Logged in as {user?.email}</span>
-            {' | '}
-            <button onClick={handleLogout}>Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            {' | '}
-            <Link to="/register">Register</Link>
-          </>
-        )}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <Link className="navbar-brand" to="/">ECommerceApi</Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navContent"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navContent">
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <Link className="nav-link" to="/">Home</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/products">Products</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/orders">My Orders</Link>
+            </li>
+          </ul>
+          <ul className="navbar-nav">
+            {token ? (
+              <>
+                <li className="nav-item">
+                  <span className="nav-link text-white-50">
+                    {user?.email}
+                  </span>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-outline-light btn-sm mt-1" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">Login</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register">Register</Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
       </nav>
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-       <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <OrdersPage />
-            </ProtectedRoute>
-          }
-        />       
- <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
+      <div className="container mt-4">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </div>
     </div>
   )
 }
