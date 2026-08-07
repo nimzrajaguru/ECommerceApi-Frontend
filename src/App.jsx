@@ -2,6 +2,7 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
+import ProductsPage from './pages/ProductsPage.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
     <div>
       <nav>
         <Link to="/">Home</Link>
+        {' | '}
+<Link to="/products">Products</Link>
         {' | '}
         {token ? (
           <>
@@ -35,6 +38,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Routes>
