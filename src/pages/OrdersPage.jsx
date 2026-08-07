@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getMyOrders } from '../services/orderService.js'
 
+const statusLabels = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
 function OrdersPage() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +30,7 @@ function OrdersPage() {
       ) : (
         orders.map((order) => (
           <div key={order.id} style={{ border: '1px solid #ccc', padding: '12px', margin: '8px' }}>
-            <p>Order #{order.id} — Status: {order.status}</p>
+            <p>Order #{order.id} — Status: {statusLabels[order.status]}</p>
             <p>Total: ${order.totalAmount}</p>
           </div>
         ))
