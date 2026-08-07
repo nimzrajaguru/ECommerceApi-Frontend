@@ -21,16 +21,25 @@ function ProductCard({ product }) {
   }
 
   return (
-    <div style={{ border: '1px solid #ccc', padding: '16px', margin: '8px', width: '200px' }}>
-      <h3>{product.name}</h3>
-      <p>{product.description}</p>
-      <p>
-        <strong>${product.price}</strong>
-      </p>
-      <p>Stock: {product.stockQuantity}</p>
-      <p>Category: {product.categoryName}</p>
-      {token && <button onClick={handleOrder}>Order Now</button>}
-      {message && <p>{message}</p>}
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <div className="card h-100 shadow-sm">
+        <div className="card-body d-flex flex-column">
+          <h5 className="card-title">{product.name}</h5>
+          <p className="card-text text-muted small">{product.description}</p>
+          <p className="card-text">
+            <strong>${product.price}</strong>
+          </p>
+          <p className="card-text small">
+            Stock: {product.stockQuantity} &middot; {product.categoryName}
+          </p>
+          {token && (
+            <button className="btn btn-primary mt-auto" onClick={handleOrder}>
+              Order Now
+            </button>
+          )}
+          {message && <p className="small mt-2">{message}</p>}
+        </div>
+      </div>
     </div>
   )
 }
