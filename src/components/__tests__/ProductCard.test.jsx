@@ -32,8 +32,20 @@ describe('ProductCard', () => {
     expect(screen.getByText('$49.99')).toBeInTheDocument()
   })
 
-  it('displays the stock quantity', () => {
+  it('displays an "In Stock" badge when stock is above the low-stock threshold', () => {
     renderWithProviders(<ProductCard product={mockProduct} />)
-    expect(screen.getByText(/Stock: 10/)).toBeInTheDocument()
+    expect(screen.getByText('In Stock')).toBeInTheDocument()
+  })
+
+  it('displays a "Low Stock" badge when stock is below 10', () => {
+    const lowStockProduct = { ...mockProduct, stockQuantity: 5 }
+    renderWithProviders(<ProductCard product={lowStockProduct} />)
+    expect(screen.getByText('Low Stock')).toBeInTheDocument()
+  })
+
+  it('displays an "Out of Stock" badge and disables ordering when stock is zero', () => {
+    const outOfStockProduct = { ...mockProduct, stockQuantity: 0 }
+    renderWithProviders(<ProductCard product={outOfStockProduct} />)
+    expect(screen.getByText('Out of Stock')).toBeInTheDocument()
   })
 })
