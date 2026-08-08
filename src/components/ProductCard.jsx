@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { createOrder } from '../services/orderService.js'
 
@@ -34,7 +35,11 @@ function ProductCard({ product }) {
           {product.name.charAt(0).toUpperCase()}
         </div>
         <div className="card-body d-flex flex-column">
-          <h5 className="card-title">{product.name}</h5>
+          <h5 className="card-title">
+            <Link to={`/products/${product.id}`} className="text-decoration-none">
+              {product.name}
+            </Link>
+          </h5>
           <p className="card-text text-muted small">{product.description}</p>
           <p className="card-text">
             <strong>${product.price}</strong>

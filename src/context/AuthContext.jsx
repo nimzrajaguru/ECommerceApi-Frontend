@@ -24,6 +24,18 @@ function getRoleFromToken(token) {
   }
 }
 
+// Reads the user's own ID from the token, needed to check review/resource
+// ownership on the frontend (e.g. "can I delete this review?").
+function getUserIdFromToken(token) {
+  if (!token) return null
+  try {
+    const decoded = jwtDecode(token)
+    return decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'))
   const [user, setUser] = useState(getStoredUser())
@@ -47,8 +59,9 @@ export function AuthProvider({ children }) {
   // Recomputed from the current token on every render, so it's never stale.
   const role = getRoleFromToken(token)
   const isAdmin = role === 'Admin'
+  const userId = getUserIdFromToken(token)
 
-  const value = { token, user, login, logout, role, isAdmin }
+  const value = { token, user, login, logout, role, isAdmin, userId }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
