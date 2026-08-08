@@ -4,6 +4,8 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
+// Automatically attaches the JWT to every outgoing request, so individual
+// service files never need to handle auth headers themselves.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
