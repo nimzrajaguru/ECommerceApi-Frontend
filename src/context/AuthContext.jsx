@@ -1,10 +1,21 @@
 import { createContext, useState, useContext } from 'react'
+import { jwtDecode } from 'jwt-decode'
 
 const AuthContext = createContext(null)
 
 function getStoredUser() {
   const stored = localStorage.getItem('user')
   return stored ? JSON.parse(stored) : null
+}
+
+function getRoleFromToken(token) {
+  if (!token) return null
+  try {
+    const decoded = jwtDecode(token)
+    return decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+  } catch {
+    return null
+  }
 }
 
 export function AuthProvider({ children }) {
@@ -25,7 +36,10 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user')
   }
 
-  const value = { token, user, login, logout }
+  const role = getRoleFromToken(token)
+  const isAdmin = role === 'Admin'
+
+  const value = { token, user, login, logout, role, isAdmin }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

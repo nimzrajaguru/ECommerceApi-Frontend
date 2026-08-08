@@ -8,9 +8,11 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 import Logo from './components/Logo.jsx'
 import Footer from './components/Footer.jsx'
+import AdminRoute from './components/AdminRoute.jsx'
+import AdminProductsPage from './pages/AdminProductsPage.jsx'
 
 function App() {
-  const { token, user, logout } = useAuth()
+  const { token, user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
 
   function handleLogout() {
@@ -45,6 +47,11 @@ function App() {
             <li className="nav-item">
               <Link className="nav-link" to="/orders">My Orders</Link>
             </li>
+      {isAdmin && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/products">Manage Products</Link>
+              </li>
+            )}
           </ul>
           <ul className="navbar-nav">
             {token ? (
@@ -86,6 +93,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+	
+	<Route
+            path="/admin/products"
+            element={
+              <AdminRoute>
+                <AdminProductsPage />
+              </AdminRoute>
+            }
+          />
+
          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
