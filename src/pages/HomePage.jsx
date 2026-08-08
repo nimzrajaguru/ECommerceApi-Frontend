@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getAllCategories } from '../services/categoryService.js'
 
 function HomePage() {
@@ -12,13 +13,29 @@ function HomePage() {
 
   return (
     <div>
-      <h1>Home Page</h1>
-      <p>Categories from the backend:</p>
-      <ul>
+      <div
+        className="p-5 mb-4 rounded-4 text-white"
+        style={{
+          background: 'linear-gradient(120deg, #4f46e5 0%, #06b6d4 100%)',
+        }}
+      >
+        <h1 className="fw-bold">Welcome to ECommerceApi</h1>
+        <p className="lead mb-4">
+          Browse our catalog, place orders, and manage your account — all in one place.
+        </p>
+        <Link to="/products" className="btn btn-light btn-lg fw-semibold">
+          Shop Now
+        </Link>
+      </div>
+
+      <h2 className="h4 mb-3">Browse by Category</h2>
+      <div className="d-flex flex-wrap gap-2">
         {categories.map((category) => (
-          <li key={category.id}>{category.name}</li>
+          <span key={category.id} className="badge rounded-pill text-bg-light border px-3 py-2 fs-6">
+            {category.name}
+          </span>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

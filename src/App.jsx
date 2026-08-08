@@ -6,6 +6,7 @@ import ProductsPage from './pages/ProductsPage.jsx'
 import OrdersPage from './pages/OrdersPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { useAuth } from './context/AuthContext.jsx'
+import Logo from './components/Logo.jsx'
 
 function App() {
   const { token, user, logout } = useAuth()
@@ -19,7 +20,10 @@ function App() {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-        <Link className="navbar-brand" to="/">ECommerceApi</Link>
+        <Link className="navbar-brand" to="/">
+          <Logo />
+          ECommerceApi
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
