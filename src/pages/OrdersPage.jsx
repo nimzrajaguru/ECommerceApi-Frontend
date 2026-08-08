@@ -1,42 +1,58 @@
-import { useState, useEffect } from 'react'
-import { getMyOrders } from '../services/orderService.js'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { listMyOrders } from '../api/orders';
+import StatusBadge from '../components/ui/StatusBadge';
+import Spinner from '../components/ui/Spinner';
+import StaggerGrid from '../components/motion/StaggerGrid';
+import { productCardVariants } from '../components/product/ProductCard';
+import { formatDate, formatPrice } from '../utils/format';
 
-const statusLabels = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
-function OrdersPage() {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+export default function OrdersPage() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getMyOrders()
-      .then((data) => {
-        setOrders(data)
-        setLoading(false)
-      })
-      .catch(() => {
-        setError('Failed to load your orders.')
-        setLoading(false)
-      })
-  }, [])
-
-  if (loading) return <p>Loading your orders...</p>
-  if (error) return <p style={{ color: 'red' }}>{error}</p>
+    listMyOrders()
+      .then((res) => setOrders(res.data))
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div>
-      <h1>My Orders</h1>
-      {orders.length === 0 ? (
-        <p>You haven't placed any orders yet.</p>
+      <h1 className="mb-6 text-2xl font-bold text-ink-950 dark:text-white">My orders</h1>
+
+      {loading ? (
+        <div className="flex justify-center py-24"><Spinner /></div>
+      ) : orders.length === 0 ? (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card px-6 py-16 text-center">
+          <p className="font-semibold text-ink-900 dark:text-white">No orders yet</p>
+          <Link className="btn-primary mt-4 inline-flex" to="/products">Start shopping</Link>
+        </motion.div>
       ) : (
-        orders.map((order) => (
-          <div key={order.id} style={{ border: '1px solid #ccc', padding: '12px', margin: '8px' }}>
-            <p>Order #{order.id} — Status: {statusLabels[order.status]}</p>
-            <p>Total: ${order.totalAmount}</p>
-          </div>
-        ))
+        <StaggerGrid className="flex flex-col gap-4">
+          {orders.map((order) => (
+            <motion.div variants={productCardVariants} className="card p-5" key={order.id}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="font-bold text-ink-950 dark:text-white">Order #{order.id}</h3>
+                  <p className="text-sm text-ink-500 dark:text-ink-400">{formatDate(order.orderDate)}</p>
+                </div>
+                <StatusBadge status={order.status} />
+              </div>
+              <ul className="mt-4 flex flex-col gap-1 border-t border-ink-100 pt-3 text-sm text-ink-600 dark:border-ink-800 dark:text-ink-300">
+                {order.items.map((item, idx) => (
+                  <li key={idx} className="flex justify-between">
+                    <span>{item.productName} × {item.quantity}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-right font-bold text-ink-950 dark:text-white">Total: {formatPrice(order.totalAmount)}</p>
+            </motion.div>
+          ))}
+        </StaggerGrid>
       )}
     </div>
-  )
+  );
 }
-
-export default OrdersPage

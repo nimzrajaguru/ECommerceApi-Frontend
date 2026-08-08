@@ -1,69 +1,49 @@
-:root {
-  --brand-primary: #4f46e5;
-  --brand-primary-dark: #4338ca;
-  --brand-secondary: #06b6d4;
-  --brand-bg: #f8f9fb;
-  --brand-text: #1f2937;
-  --brand-muted: #6b7280;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  font-family: 'Segoe UI', system-ui, Roboto, sans-serif;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased transition-colors duration-200 dark:bg-ink-950 dark:text-ink-50;
+  }
 }
 
-body {
-  margin: 0;
-  background-color: var(--brand-bg);
-  color: var(--brand-text);
-}
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
 
-/* Override Bootstrap's default blue with our brand color */
-.btn-primary {
-  --bs-btn-bg: var(--brand-primary);
-  --bs-btn-border-color: var(--brand-primary);
-  --bs-btn-hover-bg: var(--brand-primary-dark);
-  --bs-btn-hover-border-color: var(--brand-primary-dark);
-  --bs-btn-active-bg: var(--brand-primary-dark);
-  --bs-btn-active-border-color: var(--brand-primary-dark);
-}
+  .btn-primary {
+    @apply btn bg-ink-950 text-white hover:bg-brand-600 dark:bg-white dark:text-ink-950 dark:hover:bg-brand-500 dark:hover:text-white;
+  }
 
-.navbar.bg-dark {
-  background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%) !important;
-}
+  .btn-secondary {
+    @apply btn bg-white text-ink-900 ring-1 ring-inset ring-ink-200 hover:bg-ink-50 dark:bg-ink-900 dark:text-ink-50 dark:ring-ink-700 dark:hover:bg-ink-800;
+  }
 
-.card {
-  border: none;
-  border-radius: 12px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-700 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800;
+  }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.15) !important;
-}
+  .btn-danger {
+    @apply btn bg-white text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-50 dark:bg-ink-900 dark:text-red-400 dark:ring-red-900 dark:hover:bg-red-950;
+  }
 
-.card-title {
-  color: var(--brand-primary-dark);
-  font-weight: 600;
-}
+  .input {
+    @apply w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:border-ink-700 dark:bg-ink-900 dark:text-ink-50 dark:placeholder:text-ink-500 dark:focus:ring-brand-900;
+  }
 
-.brand-logo {
-  height: 32px;
-  width: 32px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
+  .card {
+    @apply rounded-2xl border border-ink-100 bg-white shadow-card dark:border-ink-800 dark:bg-ink-900;
+  }
 
-.navbar-brand {
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
-}
-
-.alert-danger {
-  border-radius: 8px;
-}
-
-.form-control:focus {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.15);
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
 }

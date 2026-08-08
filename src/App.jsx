@@ -1,115 +1,82 @@
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
-import HomePage from './pages/HomePage.jsx'
-import LoginPage from './pages/LoginPage.jsx'
-import RegisterPage from './pages/RegisterPage.jsx'
-import ProductsPage from './pages/ProductsPage.jsx'
-import ProductDetailPage from './pages/ProductDetailPage.jsx'
-import OrdersPage from './pages/OrdersPage.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
-import AdminRoute from './components/AdminRoute.jsx'
-import AdminProductsPage from './pages/AdminProductsPage.jsx'
-import { useAuth } from './context/AuthContext.jsx'
-import Logo from './components/Logo.jsx'
-import Footer from './components/Footer.jsx'
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
+import Layout from './components/layout/Layout';
+import ProtectedRoute from './routes/ProtectedRoute';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import AuthPage from './pages/AuthPage';
+import OrdersPage from './pages/OrdersPage';
+import AdminPage from './pages/admin/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
+import AboutPage from './pages/info/AboutPage';
+import SustainabilityPage from './pages/info/SustainabilityPage';
+import HelpCenterPage from './pages/info/HelpCenterPage';
+import ShippingReturnsPage from './pages/info/ShippingReturnsPage';
+import ContactPage from './pages/info/ContactPage';
 
-function App() {
-  const { token, user, logout, isAdmin } = useAuth()
-  const navigate = useNavigate()
-
-  function handleLogout() {
-    logout()
-    navigate('/login')
-  }
+function AnimatedRoutes() {
+  const location = useLocation();
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-        <Link className="navbar-brand" to="/">
-          <Logo />
-          ECommerceApi
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navContent"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navContent">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/products">Products</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/orders">My Orders</Link>
-            </li>
-            {isAdmin && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/admin/products">Manage Products</Link>
-              </li>
-            )}
-          </ul>
-          <ul className="navbar-nav">
-            {token ? (
-              <>
-                <li className="nav-item">
-                  <span className="nav-link text-white-50">
-                    {user?.email}
-                  </span>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-outline-light btn-sm mt-1" onClick={handleLogout}>
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/login">Login</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/register">Register</Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </nav>
-
-      <div className="container mt-4 flex-grow-1">
-        <Routes>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
+        <Routes location={location}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/sustainability" element={<SustainabilityPage />} />
+          <Route path="/help" element={<HelpCenterPage />} />
+          <Route path="/shipping-returns" element={<ShippingReturnsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route
             path="/orders"
-            element={
+            element={(
               <ProtectedRoute>
                 <OrdersPage />
               </ProtectedRoute>
-            }
+            )}
           />
           <Route
-            path="/admin/products"
-            element={
-              <AdminRoute>
-                <AdminProductsPage />
-              </AdminRoute>
-            }
+            path="/admin"
+            element={(
+              <ProtectedRoute adminOnly>
+                <AdminPage />
+              </ProtectedRoute>
+            )}
           />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </div>
-
-      <Footer />
-    </div>
-  )
+      </motion.div>
+    </AnimatePresence>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Layout>
+            <AnimatedRoutes />
+          </Layout>
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

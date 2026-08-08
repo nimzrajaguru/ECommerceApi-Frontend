@@ -1,71 +1,80 @@
-import { createContext, useState, useContext } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { api } from '../api/client';
+import { loginRequest, registerRequest } from '../api/auth';
+import { parseJwt } from '../utils/jwt';
 
-// Global auth state — avoids prop drilling by making token/user/role
-// available to any component via useAuth() below.
-const AuthContext = createContext(null)
-
-// Restores the logged-in user after a page refresh (React state alone
-// resets on reload; localStorage persists across it).
-function getStoredUser() {
-  const stored = localStorage.getItem('user')
-  return stored ? JSON.parse(stored) : null
-}
-
-// Decodes the JWT to read the role claim. ASP.NET Core Identity uses the
-// full legacy claim URI, not a plain "role" key.
-function getRoleFromToken(token) {
-  if (!token) return null
-  try {
-    const decoded = jwtDecode(token)
-    return decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
-  } catch {
-    return null
-  }
-}
-
-// Reads the user's own ID from the token, needed to check review/resource
-// ownership on the frontend (e.g. "can I delete this review?").
-function getUserIdFromToken(token) {
-  if (!token) return null
-  try {
-    const decoded = jwtDecode(token)
-    return decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
-  } catch {
-    return null
-  }
-}
+const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem('token'))
-  const [user, setUser] = useState(getStoredUser())
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('accessToken'));
+  const [loading, setLoading] = useState(true);
 
-  // Called after successful login/register. Persists to localStorage
-  // so the session survives a refresh.
-  function login(newToken, userData) {
-    setToken(newToken)
-    setUser(userData)
-    localStorage.setItem('token', newToken)
-    localStorage.setItem('user', JSON.stringify(userData))
-  }
+  useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-  function logout() {
-    setToken(null)
-    setUser(null)
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-  }
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-  // Recomputed from the current token on every render, so it's never stale.
-  const role = getRoleFromToken(token)
-  const isAdmin = role === 'Admin'
-  const userId = getUserIdFromToken(token)
+    const payload = parseJwt(token);
+    const roles = payload?.role || payload?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    const normalizedRoles = Array.isArray(roles) ? roles : roles ? [roles] : [];
 
-  const value = { token, user, login, logout, role, isAdmin, userId }
+    setUser({
+      email: payload?.email || localStorage.getItem('userEmail') || '',
+      firstName: payload?.given_name || localStorage.getItem('userName') || 'Customer',
+      roles: normalizedRoles
+    });
+    setLoading(false);
+  }, [token]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  const persistSession = (data) => {
+    const { token: accessToken, refreshToken, email, firstName } = data;
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('userEmail', email);
+    localStorage.setItem('userName', firstName || 'Customer');
+    setToken(accessToken);
+  };
+
+  const login = async (credentials) => {
+    const response = await loginRequest(credentials);
+    persistSession(response.data);
+    return response.data;
+  };
+
+  const register = async (credentials) => {
+    const response = await registerRequest(credentials);
+    persistSession(response.data);
+    return response.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    delete api.defaults.headers.common.Authorization;
+    setToken(null);
+    setUser(null);
+  };
+
+  const value = useMemo(() => ({
+    user,
+    token,
+    loading,
+    isAuthenticated: Boolean(token),
+    isAdmin: user?.roles?.includes('Admin') || false,
+    login,
+    register,
+    logout
+  }), [user, token, loading]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  return useContext(AuthContext)
+  return useContext(AuthContext);
 }
