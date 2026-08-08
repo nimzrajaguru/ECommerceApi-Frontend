@@ -4,11 +4,19 @@ import { getAllCategories } from '../services/categoryService.js'
 
 function HomePage() {
   const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    getAllCategories().then((data) => {
-      setCategories(data)
-    })
+    getAllCategories()
+      .then((data) => {
+        setCategories(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setError('Failed to load categories.')
+        setLoading(false)
+      })
   }, [])
 
   return (
@@ -29,13 +37,21 @@ function HomePage() {
       </div>
 
       <h2 className="h4 mb-3">Browse by Category</h2>
-      <div className="d-flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <span key={category.id} className="badge rounded-pill text-bg-light border px-3 py-2 fs-6">
-            {category.name}
-          </span>
-        ))}
-      </div>
+      {loading && <p className="text-muted">Loading categories...</p>}
+      {error && <p className="text-danger">{error}</p>}
+      {!loading && !error && (
+        <div className="d-flex flex-wrap gap-2">
+          {categories.length === 0 ? (
+            <p className="text-muted">No categories available yet.</p>
+          ) : (
+            categories.map((category) => (
+              <span key={category.id} className="badge rounded-pill text-bg-light border px-3 py-2 fs-6">
+                {category.name}
+              </span>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }
