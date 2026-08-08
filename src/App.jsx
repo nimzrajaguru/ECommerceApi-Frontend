@@ -7,6 +7,7 @@ import OrdersPage from './pages/OrdersPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 import Logo from './components/Logo.jsx'
+import Footer from './components/Footer.jsx'
 
 function App() {
   const { token, user, logout } = useAuth()
@@ -17,8 +18,9 @@ function App() {
     navigate('/login')
   }
 
-  return (
-    <div>
+
+   return (
+    <div className="d-flex flex-column min-vh-100">
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
         <Link className="navbar-brand" to="/">
           <Logo />
@@ -72,7 +74,7 @@ function App() {
         </div>
       </nav>
 
-      <div className="container mt-4">
+      <div className="container mt-4 flex-grow-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
@@ -84,10 +86,12 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/login" element={<LoginPage />} />
+         <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </div>
+
+      <Footer />
     </div>
   )
 }

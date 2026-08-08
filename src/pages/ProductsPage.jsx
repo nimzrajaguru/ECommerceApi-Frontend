@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getAllProducts } from '../services/productService.js'
 import ProductCard from '../components/ProductCard.jsx'
+import ProductCardSkeleton from '../components/ProductCardSkeleton.jsx'
 
 function ProductsPage() {
   const [products, setProducts] = useState([])
@@ -19,16 +20,15 @@ function ProductsPage() {
       })
   }, [])
 
-  if (loading) return <p>Loading products...</p>
   if (error) return <p style={{ color: 'red' }}>{error}</p>
 
   return (
     <div>
-      <h1>Products</h1>
+      <h1 className="mb-4">Products</h1>
       <div className="row">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+          : products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
     </div>
   )
